@@ -1,4 +1,4 @@
-package burlap.oomdp.singleagent.compositeaction;
+package burlap.oomdp.singleagent.classbased;
 import java.util.ArrayList;
 import java.util.List;
 

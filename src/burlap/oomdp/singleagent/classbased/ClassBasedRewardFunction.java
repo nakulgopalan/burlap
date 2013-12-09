@@ -1,11 +1,10 @@
-package burlap.oomdp.singleagent.compositereward;
+package burlap.oomdp.singleagent.classbased;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import burlap.oomdp.singleagent.compositeaction.CompositeAction;
 import burlap.oomdp.core.ObjectInstance;
 import burlap.oomdp.core.State;
 import burlap.oomdp.singleagent.GroundedAction;
