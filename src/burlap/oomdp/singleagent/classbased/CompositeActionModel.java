@@ -18,8 +18,7 @@ public abstract class CompositeActionModel {
 	 */
 	public State performCompositeAction(State s, List<GroundedAction> ja){
 		State sp = s.copy();
-		this.actionHelper(sp, ja);
-		return sp;
+		return this.actionHelper(sp, ja);
 	}
 
 	
@@ -41,7 +40,7 @@ public abstract class CompositeActionModel {
 	 * @param s the state in which the joint action is performed.
 	 * @param ja the joint action to be performed.
 	 */
-	protected abstract void actionHelper(State s, List<GroundedAction> ja);
+	protected abstract State actionHelper(State s, List<GroundedAction> ja);
 	
 
 	

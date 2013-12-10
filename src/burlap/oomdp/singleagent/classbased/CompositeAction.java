@@ -64,8 +64,10 @@ public abstract class CompositeAction extends Action{
 		List<GroundedAction> gas = new java.util.LinkedList<GroundedAction>();
 		int numArgs = 0;
 		for(Action a : actions) {
-			gas.add(new GroundedAction(a,java.util.Arrays.copyOfRange(params, numArgs, numArgs + a.getParameterClasses().length - 1)));
-			numArgs += a.getParameterClasses().length;
+			if (a.getParameterClasses().length != 0){
+			  gas.add(new GroundedAction(a,java.util.Arrays.copyOfRange(params, numArgs, numArgs + a.getParameterClasses().length - 1)));
+			  numArgs += a.getParameterClasses().length;
+			}
 		}
 		return gas;
 	}
