@@ -7,9 +7,9 @@ import burlap.oomdp.core.Domain;
 import burlap.oomdp.singleagent.Action;
 import burlap.oomdp.singleagent.GroundedAction;
 import burlap.oomdp.singleagent.RewardFunction;
-public class CompositeAction extends Action{
+public abstract class CompositeAction extends Action{
 	List<Action> actions;
-	CompositeActionModel model;
+	public CompositeActionModel model;
 	
 	public CompositeAction(String n, Domain d, List<Action> a, CompositeActionModel m){
 		super(n,d,concatArgClasses(a));
@@ -69,6 +69,8 @@ public class CompositeAction extends Action{
 		}
 		return gas;
 	}
+	
+	public abstract List<GroundedAction> getAllGroundings(State s);
 
 
 	@Override
