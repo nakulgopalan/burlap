@@ -12,7 +12,7 @@ import burlap.oomdp.singleagent.GroundedAction;
 
 import burlap.oomdp.singleagent.classbased.*;
 
-public abstract class GreedyClassBasedPolicy extends Policy {
+public class GreedyClassBasedPolicy extends Policy {
 	Map<String,ClassBasedValueFunction> classValues; List<GroundedAction> actions;
 	public GreedyClassBasedPolicy(Map<String,ClassBasedValueFunction> classValues,  List<GroundedAction> actions){
 		this.classValues = classValues; this.actions = actions;
@@ -53,6 +53,14 @@ public abstract class GreedyClassBasedPolicy extends Policy {
 	@Override
 	public boolean isStochastic() {
 		return false;
+	}
+
+	@Override
+	public boolean isDefinedFor(State s) {
+		for(String cname : s.getObjectClassesPresent()){
+			if(classValues.get(cname) == null) return false;
+		}
+		return true;
 	}
 
 }
