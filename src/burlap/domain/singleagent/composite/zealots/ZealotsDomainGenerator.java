@@ -88,13 +88,17 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 		final int curMin = lowerHealth;
 		for(int i = 0; i < numguys; i++)enemies.add("bad-zealot " + (numguys + i));
 		for(int i = 0; i < numguys; i++){
+			final int j = i;
 			actionList.add(new Action("attack (good-zealot " + i + " )",domain, "bad-zealot",true){
 
 				@Override
 				protected State performActionHelper(State s, String[] params) {
 					State newState = s.copy();
-					ObjectInstance target = newState.getObject(params[0]);
-					target.setValue("health", Math.max(curMin, target.getDiscValForAttribute("health") - 1));
+					ObjectInstance actor = newState.getObject("good-zealot " + j);
+					if (actor.getDiscValForAttribute("health") > 0){
+						ObjectInstance target = newState.getObject(params[0]);
+						target.setValue("health", Math.max(curMin, target.getDiscValForAttribute("health") - 1));
+					}
 					return newState;
 				}
 
@@ -110,8 +114,10 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 				protected State performActionHelper(State s, String[] params) {
 					State newState = s.copy();
 					ObjectInstance actor = newState.getObject("bad-zealot " + j);
-					ObjectInstance target = newState.getObject(actor.getStringValForAttribute("enemy"));
-					target.setValue("health", Math.max(curMin, target.getDiscValForAttribute("health") - 1));
+					if (actor.getDiscValForAttribute("health") > 0){
+						ObjectInstance target = newState.getObject(actor.getStringValForAttribute("enemy"));
+						target.setValue("health", Math.max(curMin, target.getDiscValForAttribute("health") - 1));
+					}
 					return newState;
 				}
 
@@ -217,7 +223,8 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 		start = System.currentTimeMillis();
 		zdg.getPolicyByVI(oneVOne, 0.95, 0.01, 1000);
 		System.out.printf("Value iteration + greedy-q policy took: %f seconds for 1v1\n",(System.currentTimeMillis() - start)/1000f);
-		
+
+		System.out.println("");
 		
 		zdg = new ZealotsDomainGenerator(2,0,4);
 		Domain twoVTwo = zdg.generateDomain();
@@ -227,7 +234,8 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 		start = System.currentTimeMillis();
 		zdg.getPolicyByVI(twoVTwo, 0.95, 0.01, 1000);
 		System.out.printf("Value iteration + greedy-q policy took: %f seconds for 2v2\n",(System.currentTimeMillis() - start)/1000f);
-		
+
+		System.out.println("");
 		
 		zdg = new ZealotsDomainGenerator(3,0,4);
 		Domain threeVThree = zdg.generateDomain();
@@ -238,5 +246,18 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 		zdg.getPolicyByVI(threeVThree, 0.95, 0.01, 1000);
 		System.out.printf("Value iteration + greedy-q policy took: %f seconds for 3v3\n",(System.currentTimeMillis() - start)/1000f);
 		
+		// RUN THIS CODE FOR A GOOD TIME
+/*		
+		System.out.println("");
+		
+		zdg = new ZealotsDomainGenerator(4,0,4);
+		Domain fourVFour = zdg.generateDomain();
+		start = System.currentTimeMillis();
+		zdg.getFactoredSolution(fourVFour, 0.95);
+		System.out.printf("Factored solution + factored policy took: %f seconds for 4v4\n",(System.currentTimeMillis() - start)/1000f);
+		start = System.currentTimeMillis();
+		zdg.getPolicyByVI(fourVFour, 0.95, 0.01, 1000);
+		System.out.printf("Value iteration + greedy-q policy took: %f seconds for 4v4\n",(System.currentTimeMillis() - start)/1000f);
+		*/
 	}
 }
