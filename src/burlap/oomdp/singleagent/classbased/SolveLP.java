@@ -78,7 +78,7 @@ public class SolveLP {
 				{
 					for(int a = 0; a < nAttributes[c]; a++)
 					{
-						state[c][o][a] = (int )(currentState.getObject(intsToObjects.get(c).get(o)).getValueForAttribute(intsToAttributes.get(c).get(a)).getNumericRepresentation());
+						state[c][o][a] = (int )(burlapState.getObject(intsToObjects.get(c).get(o)).getValueForAttribute(intsToAttributes.get(c).get(a)).getNumericRepresentation());
 					}
 				}
 			}
@@ -287,12 +287,12 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 	    for(int i = 0; i < nClasses; i++) //outer loop over classes, inner loop over possible VF input
 	    {
 	    	int instances = state[i].length;
-	    	int weight = 1/possibleInputs[i]*instances;
+	    	double weight = 1.0/possibleInputs[i]*instances;
 	    	beginVariables[i] = col;
 	    	for(int j = 0; j < possibleInputs[i]; j++)
 	    	{
 	    		objective[col] = weight;
-	    		lp.setBounds(col, -1*lp.getInfinite(), lp.getInfinite());
+	    		//lp.setBounds(col, -1*lp.getInfinite(), lp.getInfinite());
 	    		col++;
 	    	}
 	    }
@@ -323,7 +323,6 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 	    				transitionProbability[i] = tpList.get(i).p;
 	    				transitionedState[i] = stateConverter.burlapToMine(tpList.get(i).s);
 	    			}
-	    			
 
 	    			for (int s = 0; s < transitionProbability.length; s++) //iterate over next state
 	    			{
@@ -337,8 +336,7 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 	    						{
 	    							input.add(transitionedState[s][vFDependencies[c][i][0]][objectDependencies[c][o][i]][vFDependencies[c][i][1]]);
 	    						}
-	    						Map<List<Integer>,Integer> intermediate = whichVariable.get(c);
-	    						int matchingVariable = intermediate.get(input);
+	    						int matchingVariable = whichVariable.get(c).get(input);
 	    						constraint[matchingVariable] += transitionProbability[s]*discountFactor;
 
 	    					}
@@ -355,7 +353,7 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 	    					List<Integer> input = new ArrayList<Integer>();
 	    					for(int i = 0; i < vFDependencies[c].length; i++)
 	    					{
-	    						input.add(state[vFDependencies[c][i][1]][objectDependencies[c][o][i]][vFDependencies[c][i][1]]);
+	    						input.add(state[vFDependencies[c][i][0]][objectDependencies[c][o][i]][vFDependencies[c][i][1]]);
 	    					}
 	    					int matchingVariable = whichVariable.get(c).get(input);
 	    					constraint[matchingVariable] += -1;
@@ -363,7 +361,7 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 	    				}
 	    			}
 
-	    			lp.addConstraint(constraint, LpSolve.LE, reward);
+	    			lp.addConstraint(constraint, LpSolve.LE, -1.*reward);
 
 	    			for (int c = 0; c < nClasses; c++)
 	    			{
@@ -400,6 +398,7 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 	    
 
 	    lp.setAddRowmode(false);
+	    lp.setMinim();
 	    
 	    lp.solve();
 	    double[] weights = lp.getPtrVariables();
@@ -415,24 +414,45 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 				{
 					newList.add(key.get(i));
 				}
-				Map<List<Integer>,Integer> stuff = whichVariable.get(c);
-				Integer weightIndex = stuff.get(key);
-				double weight = weights[weightIndex.intValue()-1];
 				
-				valueFunction.put(
-						newList,
-						new Double(
-								weights[
-								        whichVariable
-								        .get(c)
-								        .get(key).intValue() -1
-								        ])
+				valueFunction.put(newList, new Double(weights[whichVariable.get(c).get(key).intValue()-1])
 				);
 	    		cbvfs.get(intToClass.get(c)).setValueFunction(valueFunction);
 	    	
 	    	}
 	    	
 	    }
+	    
+
+    	System.out.println("Enemies Health:");
+    	for(int i = 1; i < 6; i++)
+	    {
+    		System.out.println(i%5 + ": " + weights[i-1]);
+	    }
+
+    	System.out.println("Enemies Health, My Health:");
+	    for(int i = 6; i < weights.length+1; i++)
+	    {
+	    	System.out.println(((i)/5-1)%5 + ", " + (i)%5 + ": " + weights[i-1]);
+	    }
+	    System.out.println();
+	    System.out.println();
+	    /*
+	    double[] constraint = new double[31]; 
+	    for(int i = 0; i < lp.getNrows()+1; i++)
+	    {
+	    	lp.getRow(i, constraint);
+    		System.out.print(lp.getRh(i) + " > ");
+	    	for(int j = 0; j < constraint.length; j++)
+		    {
+		    	System.out.print(constraint[j] + ", ");
+		    }
+		    System.out.println();
+	    	
+	    }
+	    */
+	    
+	    
 	    lp.deleteLp();
 	}
     catch (LpSolveException e) {
