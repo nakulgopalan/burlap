@@ -149,11 +149,14 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 
 	public RewardFunction getRewardFunction(Domain domain){
 		final int curMin = lowerHealth;
+		final Domain curDomain = domain;
 		return new RewardFunction(){
+			private TerminalFunction tf = getTerminalFunction(curDomain);
+			
 			@Override
 			public double reward(State s, GroundedAction a, State sprime) {
 				double out = 0;
-				for(ObjectInstance o : sprime.getObjectsOfTrueClass("bad-zealot")){
+				if (!tf.isTerminal(s)) for(ObjectInstance o : sprime.getObjectsOfTrueClass("bad-zealot")){
 					out += (o.getDiscValForAttribute("health") == curMin) ? 10 : 0;
 				}
 				return out;
