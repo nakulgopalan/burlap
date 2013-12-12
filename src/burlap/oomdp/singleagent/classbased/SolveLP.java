@@ -292,7 +292,7 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 	    	for(int j = 0; j < possibleInputs[i]; j++)
 	    	{
 	    		objective[col] = weight;
-	    		//lp.setBounds(col, -1*lp.getInfinite(), lp.getInfinite());
+	    		lp.setBounds(col, -1000/*-1*lp.getInfinite()*/, lp.getInfinite());
 	    		col++;
 	    	}
 	    }
