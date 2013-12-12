@@ -35,6 +35,7 @@ public class SolveLP {
 			nClasses = domain.getObjectClasses().size();
 			
 			nObjects = new int[nClasses];
+			nAttributes = new int[nClasses];
 			objectsToInts = new ArrayList<Map<String,Integer>>();
 			intsToObjects = new ArrayList<Map<Integer,String>>();
 			attributesToInts = new ArrayList<Map<String,Integer>>();
@@ -116,6 +117,7 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 		for(int i = 0; i < nClasses; i++)
 		{
 			nAttributes[i] = intsToAttributes.get(i).size();
+			nAttValues[i] = new int[nAttributes[i]];
 			for(int j = 0; j < nAttributes[i]; j++)
 			{
 				nAttValues[i][j] = domain.getObjectClass(intToClass.get(i)).attributeMap.get(intsToAttributes.get(i).get(j)).discValues.size();
