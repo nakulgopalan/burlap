@@ -2,6 +2,7 @@ package burlap.oomdp.core;
 
 import java.util.*;
 
+import burlap.oomdp.singleagent.classbased.CompositeAction;
 import burlap.oomdp.singleagent.Action;
 import burlap.oomdp.singleagent.GroundedAction;
 
@@ -480,23 +481,29 @@ public class State {
 	 */
 	public List <GroundedAction> getAllGroundedActionsFor(Action a){
 		
-		List <GroundedAction> res = new ArrayList<GroundedAction>();
 		
-		if(a.getParameterClasses().length == 0){
-			if(a.applicableInState(this, "")){
-				res.add(new GroundedAction(a, new String[]{}));
+		List <GroundedAction> res;
+		if (! (a instanceof CompositeAction)) {
+			res = new ArrayList<GroundedAction>();
+		
+			if(a.getParameterClasses().length == 0){
+				if(a.applicableInState(this, "")){
+					res.add(new GroundedAction(a, new String[]{}));
+				}
+				return res; //no parameters so just the single ga without params
 			}
-			return res; //no parameters so just the single ga without params
-		}
 		
-		List <List <String>> bindings = this.getPossibleBindingsGivenParamOrderGroups(a.getParameterClasses(), a.getParameterOrderGroups());
+			List <List <String>> bindings = this.getPossibleBindingsGivenParamOrderGroups(a.getParameterClasses(), a.getParameterOrderGroups());
 		
-		for(List <String> params : bindings){
-			String [] aprams = params.toArray(new String[params.size()]);
-			if(a.applicableInState(this, aprams)){
-				GroundedAction gp = new GroundedAction(a, aprams);
-				res.add(gp);
+			for(List <String> params : bindings){
+				String [] aprams = params.toArray(new String[params.size()]);
+				if(a.applicableInState(this, aprams)){
+					GroundedAction gp = new GroundedAction(a, aprams);
+					res.add(gp);
+				}
 			}
+		} else {
+			res = ((CompositeAction)a).getAllGroundings(this);
 		}
 		
 		return res;
