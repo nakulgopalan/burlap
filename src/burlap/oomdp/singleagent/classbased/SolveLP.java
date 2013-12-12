@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import burlap.oomdp.singleagent.GroundedAction;
+import burlap.oomdp.singleagent.RewardFunction;
 import burlap.oomdp.core.Domain;
 import burlap.oomdp.core.ObjectInstance;
 import burlap.oomdp.core.State;
@@ -93,7 +94,7 @@ public class SolveLP {
 		discountFactor = gamma;
 	}
 	
-public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValueFunction> cbvfs, ClassBasedRewardFunction rewardFunction) {
+public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValueFunction> cbvfs, RewardFunction rewardFunction) {
 	try {
 		
 		int nClasses = domain.getObjectClasses().size();

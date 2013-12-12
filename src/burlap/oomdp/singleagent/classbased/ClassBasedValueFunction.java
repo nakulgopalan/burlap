@@ -18,23 +18,22 @@ public class ClassBasedValueFunction {
 		public String sourceAttribute;
 		public String targetAttribute;
 		public String targetClass;
-		LinkedAttribute(String cName, String aName, String faName){
+		public LinkedAttribute(String cName, String aName, String fcName, String faName){
 			sourceClass = cName;
 			sourceAttribute = aName;
+			targetClass = fcName;
 			targetAttribute = faName;
 		}
 		
 		public int compareTo(LinkedAttribute o){
 			int first = sourceClass.compareTo(o.sourceClass);
 			int second = sourceAttribute.compareTo(o.sourceAttribute);
-			int third = targetAttribute.compareTo(o.targetAttribute);
-			int fourth = targetClass.compareTo(o.targetClass);
+			int third = targetClass.compareTo(o.targetClass);
+			int fourth = targetAttribute.compareTo(o.targetAttribute);
 			return first != 0 ? first : (second != 0 ? second : (third != 0 ? third : (fourth)));
 		}
 	}
 
-	Map<State, Double> classValues;
-	
 	SortedSet<String> attributes;
 
 	SortedSet<LinkedAttribute> foreignAttributes;
@@ -43,8 +42,7 @@ public class ClassBasedValueFunction {
 	
 	Map<List<Integer>,Double> valueFunction;
 	
-	public ClassBasedValueFunction( String initClassname, SortedSet<String> initAttributes, SortedSet<LinkedAttribute> initLinkedAttributes, Map<State, Double> initValues){
-		classValues = initValues;
+	public ClassBasedValueFunction( String initClassname, SortedSet<String> initAttributes, SortedSet<LinkedAttribute> initLinkedAttributes){
 		className = initClassname;
 		attributes = initAttributes;
 		foreignAttributes = initLinkedAttributes;
@@ -66,10 +64,6 @@ public class ClassBasedValueFunction {
 		return valueFunction.get(localState);
 	}
 	
-	public Map<State, Double> getClassValues(){
-		return classValues;
-	}
-	
 	public SortedSet<String> getAttributes(){
 		return attributes;
 	}
@@ -84,19 +78,6 @@ public class ClassBasedValueFunction {
 	
 	public void setValueFunction(Map<List<Integer>,Double> initFunction){
 		valueFunction = initFunction;
-	}
-	
-	public void setClassValue(State sname, Double svalue){
-		classValues.put(sname, svalue);
-		}
-	
-	
-	public void setClassValues(Map<State, Double> initValues){
-		classValues = initValues;
-		}
-			
-	public void clearClassValues(State sname){
-		classValues.remove(sname);
 	}
 	
 	public void addAttribute(String attribute){
