@@ -229,7 +229,7 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 		System.out.printf("Value iteration + greedy-q policy took: %f seconds for 2v2\n",(System.currentTimeMillis() - start)/1000f);
 		
 		
-		zdg = new ZealotsDomainGenerator(1,0,4);
+		zdg = new ZealotsDomainGenerator(3,0,4);
 		Domain threeVThree = zdg.generateDomain();
 		start = System.currentTimeMillis();
 		zdg.getFactoredSolution(threeVThree, 0.95);
