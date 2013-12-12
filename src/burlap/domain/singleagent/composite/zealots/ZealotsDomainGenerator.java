@@ -1,4 +1,4 @@
-package burlap.oomdp.domain.singleagent.composite.zealots;
+package burlap.domain.singleagent.composite.zealots;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +52,8 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 
 		Attribute enemies = new Attribute(ourDomain, "enemies", Attribute.AttributeType.MULTITARGETRELATIONAL);
 		goodguys.addAttribute(enemies);
+		
+		Action attackAction = getAttackAction(ourDomain);
 
 		return ourDomain;
 	}
@@ -84,9 +86,9 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 		List<List<String>> paramsList = new ArrayList<List<String>>(2*numguys);
 		List<String> enemies = new ArrayList<String>(2*numguys);
 		final int curMin = lowerHealth;
-		for(int i = 0; i < numguys; i++)enemies.add("bad-zealot " + (numguys + 3));
+		for(int i = 0; i < numguys; i++)enemies.add("bad-zealot " + (numguys + i));
 		for(int i = 0; i < numguys; i++){
-			actionList.add(new Action("attack (good-zealot " + i + " )",domain, "bad-zealot"){
+			actionList.add(new Action("attack (good-zealot " + i + " )",domain, "bad-zealot",true){
 
 				@Override
 				protected State performActionHelper(State s, String[] params) {
@@ -102,7 +104,7 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 
 		for(int i = numguys; i < 2*numguys; i++){
 			final int j = i;
-			actionList.add(new Action("attack (bad-zealot " + i + " )",domain, ""){
+			actionList.add(new Action("attack (bad-zealot " + i + " )",domain, "", true){
 
 				@Override
 				protected State performActionHelper(State s, String[] params) {
@@ -114,7 +116,6 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 				}
 
 			});
-			paramsList.add(new ArrayList<String>(0));
 		}
 
 		return new AllZealotsAction("attack",domain,actionList,paramsList,new CompositeActionModel(){

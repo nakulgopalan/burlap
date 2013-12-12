@@ -413,7 +413,20 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 				{
 					newList.add(key.get(i));
 				}
-				valueFunction.put(newList, new Double(weights[whichVariable.get(c).get(key)]));
+				Map<List<Integer>,Integer> stuff = whichVariable.get(c);
+				Integer weightIndex = stuff.get(key);
+				double weight = weights[weightIndex.intValue()];
+				
+				valueFunction.put(
+						newList,
+						new Double(
+					/*			weights[
+								        whichVariable
+								        .get(c)
+								        .get(key)
+								        ]*/
+								        	weight	)
+				);
 	    		cbvfs.get(intToClass.get(c)).setValueFunction(valueFunction);
 	    	
 	    	}

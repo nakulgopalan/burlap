@@ -68,6 +68,10 @@ public abstract class Action {
 	 * @param parameterClasses a comma delineated String of the names of the object classes to which bound parameters must belong 
 	 */
 	public Action(String name, Domain domain, String parameterClasses){
+		this(name,domain,parameterClasses,false);
+	}
+	
+	public Action(String name, Domain domain, String parameterClasses, boolean noAdd){
 		
 		String [] pClassArray;
 		if(parameterClasses.equals("")){
@@ -83,7 +87,7 @@ public abstract class Action {
 			pog[i] = name + ".P" + i;
 		}
 		
-		this.init(name, domain, pClassArray, pog);
+		this.init(name, domain, pClassArray, pog,noAdd);
 		
 	}
 	
@@ -98,15 +102,21 @@ public abstract class Action {
 	 */
 	public Action(String name, Domain domain, String [] parameterClasses){
 		
+		this(name,domain,parameterClasses,false);
+		
+	}
+	
+
+	public Action(String name, Domain domain, String [] parameterClasses,boolean noAdd){
+		
 		String [] pog = new String[parameterClasses.length];
 		//without parameter order group specified, all parameters are assumed to be in a different group
 		for(int i = 0; i < pog.length; i++){
 			pog[i] = name + ".P" + i;
 		}
-		this.init(name, domain, parameterClasses, pog);
+		this.init(name, domain, parameterClasses, pog, noAdd);
 		
 	}
-	
 	
 	/**
 	 * Initializes the action with the name of the action, the domain to which it belongs, the parameters it takes, and the parameter order groups.
@@ -117,15 +127,22 @@ public abstract class Action {
 	 * @param parameterOrderGroups the order group assignments for each of the parameters.
 	 */
 	public Action(String name, Domain domain, String [] parameterClasses, String [] parameterOrderGroups){
-		this.init(name, domain, parameterClasses, parameterOrderGroups);
+		this(name, domain, parameterClasses, parameterOrderGroups,false);
+	}
+	
+	public Action(String name, Domain domain, String [] parameterClasses, String [] parameterOrderGroups, boolean noAdd){
+		this.init(name, domain, parameterClasses, parameterOrderGroups,noAdd);
 	}
 	
 	
 	protected void init(String name, Domain domain, String [] parameterClasses, String [] parameterOrderGroups){
+		init(name,domain,parameterClasses,parameterOrderGroups,false);
+	}
+	protected void init(String name, Domain domain, String [] parameterClasses, String [] parameterOrderGroups, boolean noAdd){
 		
 		this.name = name;
 		this.domain = domain;
-		this.domain.addAction(this);
+		if(!noAdd) this.domain.addAction(this);
 		this.parameterClasses = parameterClasses;
 		this.parameterOrderGroup = parameterOrderGroups;
 		

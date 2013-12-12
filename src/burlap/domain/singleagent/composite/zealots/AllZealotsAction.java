@@ -1,4 +1,4 @@
-package burlap.oomdp.domain.singleagent.composite.zealots;
+package burlap.domain.singleagent.composite.zealots;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +15,7 @@ public class AllZealotsAction extends CompositeAction {
 	List<List<String>> params;	
 	public AllZealotsAction(String name, Domain domain, List<Action> subactions, List<List<String>> params, CompositeActionModel model){
 		super(name,domain,subactions,model);
-		domain.getActions().remove(subactions);
+		//domain.getActions().remove(subactions);
 		this.params = params;
 	}
 	
@@ -39,7 +39,7 @@ public class AllZealotsAction extends CompositeAction {
 		String[] gParams = new String[params.size()];
 		for(int i = 0; i < gParams.length; i++) gParams[i] = params.get(i).get(nextIndices[i]);
 		sofar.add(new GroundedAction(this, gParams));
-		return getNextGrounding(sofar, nextIndices, maxes, count);
+		return getNextGrounding(sofar, nextIndices, maxes, count-1);
 		
 	}
 	
