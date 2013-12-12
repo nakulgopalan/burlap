@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import burlap.behavior.singleagent.Policy;
@@ -235,18 +236,21 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 		ZealotsDomainGenerator zdg = new ZealotsDomainGenerator(1,0,4);
 		Domain oneVOne = zdg.generateDomain();
 		long start = System.currentTimeMillis();
-		Policy fs = zdg.getPolicyFromFactoredSolution(oneVOne, zdg.getFactoredSolution(oneVOne, 0.4));
+		HashMap<String,ClassBasedValueFunction> cbvf1 = zdg.getFactoredSolution(oneVOne, 0.4);
+		Policy fs1 = zdg.getPolicyFromFactoredSolution(oneVOne,cbvf1);
 		System.out.printf("Factored solution + factored policy took: %f seconds for 1v1\n",(System.currentTimeMillis() - start)/1000f);
 		start = System.currentTimeMillis();
 		Policy gq = zdg.getPolicyByVI(oneVOne, 0.4, 0.01, 1000);
 		System.out.printf("Value iteration + greedy-q policy took: %f seconds for 1v1\n",(System.currentTimeMillis() - start)/1000f);
 		
+		System.out.println();
+		System.out.println("Running 1v1 factored policy on 1v1");
 		State current = zdg.getInitState(oneVOne);
 		double cumulativeReward = 0;
 		TerminalFunction tf = zdg.getTerminalFunction(oneVOne);
 		RewardFunction rf = zdg.getRewardFunction(oneVOne);
 		while(!tf.isTerminal(current)){
-			GroundedAction ga = fs.getAction(current);
+			GroundedAction ga = fs1.getAction(current);
 			State next = ga.executeIn(current);
 			cumulativeReward += rf.reward(current, ga, next);
 			
@@ -262,6 +266,9 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 			current = next;
 		}
 		
+		System.out.println("\n\n\n");
+
+		System.out.println("Running 1v1 greedy-q policy on 1v1");
 		current = zdg.getInitState(oneVOne);
 		cumulativeReward = 0;
 		while(!tf.isTerminal(current)){
@@ -282,12 +289,13 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 		}
 		
 
-		System.out.println("");
+		System.out.println("\n\n----------------------------------\n\n");
 		
 		zdg = new ZealotsDomainGenerator(2,0,4);
 		Domain twoVTwo = zdg.generateDomain();
 		start = System.currentTimeMillis();
-		fs =  zdg.getPolicyFromFactoredSolution(twoVTwo, zdg.getFactoredSolution(twoVTwo, 0.4));
+		HashMap<String,ClassBasedValueFunction> cbvf2 = zdg.getFactoredSolution(twoVTwo, 0.4);
+		Policy fs2 = zdg.getPolicyFromFactoredSolution(twoVTwo,cbvf2);
 		System.out.printf("Factored solution + factored policy took: %f seconds for 2v2\n",(System.currentTimeMillis() - start)/1000f);
 		start = System.currentTimeMillis();
 		gq = zdg.getPolicyByVI(twoVTwo, 0.4, 0.01, 1000);
@@ -296,12 +304,13 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 		System.out.println("");
 		
 		//*
+		System.out.println("Running 2v2 factored policy on 2v2");
 		current = zdg.getInitState(twoVTwo);
 		cumulativeReward = 0;
 		tf = zdg.getTerminalFunction(twoVTwo);
 		rf = zdg.getRewardFunction(twoVTwo);
 		while(!tf.isTerminal(current)){
-			GroundedAction ga = fs.getAction(current);
+			GroundedAction ga = fs2.getAction(current);
 			State next = ga.executeIn(current);
 			cumulativeReward += rf.reward(current, ga, next);
 			
@@ -319,6 +328,30 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 		
 		System.out.println("\n\n\n");
 		
+		Policy fs12 = zdg.getPolicyFromFactoredSolution(twoVTwo,cbvf1);
+		System.out.println("Running 1v1 factored policy on 2v2");
+		current = zdg.getInitState(twoVTwo);
+		cumulativeReward = 0;
+		while(!tf.isTerminal(current)){
+			GroundedAction ga = fs12.getAction(current);
+			State next = ga.executeIn(current);
+			cumulativeReward += rf.reward(current, ga, next);
+			
+			System.out.print("Stats:\n");
+			for(ObjectInstance o : current.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			for(ObjectInstance o : next.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			System.out.println(cumulativeReward + "\n");
+			
+			current = next;
+		}
+		
+		System.out.println("\n\n\n");
+		
+		System.out.println("Running 2v2 greedy-q policy on 2v2");
 		current = zdg.getInitState(twoVTwo);
 		cumulativeReward = 0;
 		while(!tf.isTerminal(current)){
@@ -339,17 +372,197 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 		}
 		//*/
 		
-		/*
+		//*
+		System.out.println("\n\n----------------------------------\n\n");
+		
 		zdg = new ZealotsDomainGenerator(3,0,4);
 		Domain threeVThree = zdg.generateDomain();
 		start = System.currentTimeMillis();
-		zdg.getFactoredSolution(threeVThree, 0.95);
+		HashMap<String,ClassBasedValueFunction> cbvf3 = zdg.getFactoredSolution(threeVThree, 0.4);
+		Policy fs3 = zdg.getPolicyFromFactoredSolution(threeVThree,cbvf3);
 		System.out.printf("Factored solution + factored policy took: %f seconds for 3v3\n",(System.currentTimeMillis() - start)/1000f);
 		start = System.currentTimeMillis();
-		zdg.getPolicyByVI(threeVThree, 0.95, 0.01, 1000);
+		gq = zdg.getPolicyByVI(threeVThree, 0.4, 0.01, 1000);
 		System.out.printf("Value iteration + greedy-q policy took: %f seconds for 3v3\n",(System.currentTimeMillis() - start)/1000f);
 		
-		*/
+		//*/
+		
+		System.out.println("");
+		
+		//*
+		System.out.println("Running 3v3 factored policy on 3v3");
+		current = zdg.getInitState(threeVThree);
+		cumulativeReward = 0;
+		tf = zdg.getTerminalFunction(threeVThree);
+		rf = zdg.getRewardFunction(threeVThree);
+		while(!tf.isTerminal(current)){
+			GroundedAction ga = fs3.getAction(current);
+			State next = ga.executeIn(current);
+			cumulativeReward += rf.reward(current, ga, next);
+			
+			System.out.print("Stats:\n");
+			for(ObjectInstance o : current.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			for(ObjectInstance o : next.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			System.out.println(cumulativeReward + "\n");
+			
+			current = next;
+		}
+		
+		System.out.println("\n\n\n");
+		
+
+		Policy fs23 = zdg.getPolicyFromFactoredSolution(threeVThree,cbvf2);
+		System.out.println("Running 2v2 factored policy on 3v3");
+		current = zdg.getInitState(threeVThree);
+		cumulativeReward = 0;
+		while(!tf.isTerminal(current)){
+			GroundedAction ga = fs23.getAction(current);
+			State next = ga.executeIn(current);
+			cumulativeReward += rf.reward(current, ga, next);
+			
+			System.out.print("Stats:\n");
+			for(ObjectInstance o : current.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			for(ObjectInstance o : next.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			System.out.println(cumulativeReward + "\n");
+			
+			current = next;
+		}
+		
+		System.out.println("\n\n\n");
+		
+		Policy fs13 = zdg.getPolicyFromFactoredSolution(threeVThree,cbvf1);
+		System.out.println("Running 1v1 factored policy on 3v3");
+		current = zdg.getInitState(threeVThree);
+		cumulativeReward = 0;
+		while(!tf.isTerminal(current)){
+			GroundedAction ga = fs13.getAction(current);
+			State next = ga.executeIn(current);
+			cumulativeReward += rf.reward(current, ga, next);
+			
+			System.out.print("Stats:\n");
+			for(ObjectInstance o : current.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			for(ObjectInstance o : next.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			System.out.println(cumulativeReward + "\n");
+			
+			current = next;
+		}
+		
+		System.out.println("\n\n\n");
+		
+		System.out.println("Running 3v3 greedy-q policy on 3v3");
+		current = zdg.getInitState(threeVThree);
+		cumulativeReward = 0;
+		while(!tf.isTerminal(current)){
+			GroundedAction ga = gq.getAction(current);
+			State next = ga.executeIn(current);
+			cumulativeReward += rf.reward(current, ga, next);
+			
+			System.out.print("Stats:\n");
+			for(ObjectInstance o : current.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			for(ObjectInstance o : next.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			System.out.println(cumulativeReward + "\n");
+			
+			current = next;
+		}
+		//*/
+
+		System.out.println("\n\n----------------------------------\n\n");
+		System.out.println("Can't get any 'solutions here', but let's try our factored policies!");
+		zdg = new ZealotsDomainGenerator(4,0,4);
+		Domain fourVFour = zdg.generateDomain();
+		System.out.println("");
+		
+		//*
+		Policy fs34 = zdg.getPolicyFromFactoredSolution(fourVFour,cbvf3);
+		System.out.println("Running 3v3 factored policy on 4v4");
+		current = zdg.getInitState(fourVFour);
+		cumulativeReward = 0;
+		tf = zdg.getTerminalFunction(fourVFour);
+		rf = zdg.getRewardFunction(fourVFour);
+		while(!tf.isTerminal(current)){
+			GroundedAction ga = fs3.getAction(current);
+			State next = ga.executeIn(current);
+			cumulativeReward += rf.reward(current, ga, next);
+			
+			System.out.print("Stats:\n");
+			for(ObjectInstance o : current.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			for(ObjectInstance o : next.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			System.out.println(cumulativeReward + "\n");
+			
+			current = next;
+		}
+		
+		System.out.println("\n\n\n");
+		
+
+		System.out.println("Running 2v2 factored policy on 4v4");
+		Policy fs24 = zdg.getPolicyFromFactoredSolution(fourVFour,cbvf2);
+		current = zdg.getInitState(fourVFour);
+		cumulativeReward = 0;
+		while(!tf.isTerminal(current)){
+			GroundedAction ga = fs24.getAction(current);
+			State next = ga.executeIn(current);
+			cumulativeReward += rf.reward(current, ga, next);
+			
+			System.out.print("Stats:\n");
+			for(ObjectInstance o : current.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			for(ObjectInstance o : next.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			System.out.println(cumulativeReward + "\n");
+			
+			current = next;
+		}
+		
+		System.out.println("\n\n\n");
+		
+
+		System.out.println("Running 1v1 factored policy on 4v4");
+		Policy fs14 = zdg.getPolicyFromFactoredSolution(fourVFour,cbvf1);
+		current = zdg.getInitState(fourVFour);
+		cumulativeReward = 0;
+		while(!tf.isTerminal(current)){
+			GroundedAction ga = fs14.getAction(current);
+			State next = ga.executeIn(current);
+			cumulativeReward += rf.reward(current, ga, next);
+			
+			System.out.print("Stats:\n");
+			for(ObjectInstance o : current.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			for(ObjectInstance o : next.getAllObjects() ) 
+				System.out.printf("%s - %s\t;\t",o.getName(),o.getDiscValForAttribute("health"));
+			System.out.print("\n");
+			System.out.println(cumulativeReward + "\n");
+			
+			current = next;
+		}
+		
+		System.out.println("\n\n\n");
+		
+		//*/
 		
 		/*
 		// RUN THIS CODE FOR A GOOD TIME
