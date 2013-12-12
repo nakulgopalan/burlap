@@ -147,7 +147,7 @@ public class ZealotsDomainGenerator implements DomainGenerator {
 			@Override
 			public double reward(State s, GroundedAction a, State sprime) {
 				double out = 0;
-				for(ObjectInstance o : s.getObjectsOfTrueClass("bad-zealot")){
+				for(ObjectInstance o : sprime.getObjectsOfTrueClass("bad-zealot")){
 					out += (o.getDiscValForAttribute("health") == curMin) ? 10 : 0;
 				}
 				return out;

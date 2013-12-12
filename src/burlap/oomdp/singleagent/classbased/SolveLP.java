@@ -73,6 +73,7 @@ public class SolveLP {
 			
 			for(int c = 0; c < nClasses; c++)
 			{
+				state[c] = new int[nObjects[c]][nAttributes[c]];
 				for(int o = 0; o < nObjects[c]; o++)
 				{
 					for(int a = 0; a < nAttributes[c]; a++)
@@ -262,7 +263,6 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 					newList.add(list.get(i));
 				}
 				list = newList;
-				map.put(list,col);
 				for(int i = 0; i < vFDependencies[c].length; i++) //increment input
 				{
 					if(list.get(i)+1 < nAttValues[vFDependencies[c][i][0]][vFDependencies[c][i][1]])
@@ -274,6 +274,7 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 						list.set(i,0);
 					}
 				}
+				map.put(list,col);
 				col++;
 			}while(!list.equals(zeroList));
 			whichVariable.add(map);
@@ -336,7 +337,8 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 	    						{
 	    							input.add(transitionedState[s][vFDependencies[c][i][0]][objectDependencies[c][o][i]][vFDependencies[c][i][1]]);
 	    						}
-	    						int matchingVariable = whichVariable.get(c).get(input);
+	    						Map<List<Integer>,Integer> intermediate = whichVariable.get(c);
+	    						int matchingVariable = intermediate.get(input);
 	    						constraint[matchingVariable] += transitionProbability[s]*discountFactor;
 
 	    					}
@@ -415,17 +417,16 @@ public void solveLP(Domain domain, State burlapState, Map<String, ClassBasedValu
 				}
 				Map<List<Integer>,Integer> stuff = whichVariable.get(c);
 				Integer weightIndex = stuff.get(key);
-				double weight = weights[weightIndex.intValue()];
+				double weight = weights[weightIndex.intValue()-1];
 				
 				valueFunction.put(
 						newList,
 						new Double(
-					/*			weights[
+								weights[
 								        whichVariable
 								        .get(c)
-								        .get(key)
-								        ]*/
-								        	weight	)
+								        .get(key).intValue() -1
+								        ])
 				);
 	    		cbvfs.get(intToClass.get(c)).setValueFunction(valueFunction);
 	    	
